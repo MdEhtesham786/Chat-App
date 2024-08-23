@@ -5,6 +5,8 @@ import axios from "../utils/axiosConfig";
 
 import BackButton from "../components/BackButton";
 export default VerificationScreen = ({ navigation }) => {
+    axios.defaults.withCredentials = true; //The most important line for cookies
+
     const [disable, setDisable] = useState(true);
     const [email, setEmail] = useState('');
     const [isLoading, setIsLoading] = useState(false);
@@ -38,7 +40,7 @@ export default VerificationScreen = ({ navigation }) => {
                 console.log('Please enter the email');
             }
         } catch (err) {
-            console.log(err);
+            console.log(err.response.data.error);
             setIsLoading(false);
             setDisable(false);
         }

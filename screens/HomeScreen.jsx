@@ -4,6 +4,8 @@ import BackButton from "../components/BackButton";
 
 import { useState, useEffect } from "react";
 export default HomeScreen = ({ navigation, route }) => {
+      axios.defaults.withCredentials = true; //The most important line for cookies
+
     const [disable, setDisable] = useState(true);
     const [isLoading, setIsLoading] = useState(false);
     const [name, setName] = useState();

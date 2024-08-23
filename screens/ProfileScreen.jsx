@@ -5,6 +5,8 @@ import axios from "../utils/axiosConfig";
 
 import { useEffect, useState } from "react";
 export default ProfileScreen = ({ navigation, route }) => {
+      axios.defaults.withCredentials = true; //The most important line for cookies
+
     const { user } = route.params;
     const [formData, setFormdata] = useState({ firstname: '', lastname: '' });
     const [disable, setDisable] = useState(true);

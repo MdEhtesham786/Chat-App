@@ -1,17 +1,13 @@
 import { View, Text, SafeAreaView, Platform, StyleSheet, StatusBar, Image, TouchableOpacity } from "react-native";
-import axios from "../utils/axiosConfig";
+// import axios from "../utils/axiosConfig";
+import axios from "axios";
 
 import image1 from "../assets/images/image1.png";
 import image2 from "../assets/images/image2.png";
 export default WalkthroughScreen = ({ navigation, route }) => {
-    const fetchData = async () => {
-        try {
+    axios.defaults.withCredentials = true; //The most important line for cookies
 
-        } catch (err) {
-            console.log(err);
 
-        }
-    };
     return (
         <SafeAreaView style={styles.container}>
             <View style={styles.imageContainer}>
@@ -22,6 +18,7 @@ export default WalkthroughScreen = ({ navigation, route }) => {
                 <Text style={styles.descriptionText}>
                     Connect easily with your friends and family over countries
                 </Text>
+
             </View>
             <View style={styles.buttonContainer}>
                 <Text style={{ fontSize: 16 }} >Terms & Privacy Policy</Text>
