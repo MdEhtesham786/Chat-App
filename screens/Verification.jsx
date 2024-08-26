@@ -6,7 +6,6 @@ import axios from "../utils/axiosConfig";
 import BackButton from "../components/BackButton";
 export default VerificationScreen = ({ navigation }) => {
     axios.defaults.withCredentials = true; //The most important line for cookies
-
     const [disable, setDisable] = useState(true);
     const [email, setEmail] = useState('');
     const [isLoading, setIsLoading] = useState(false);

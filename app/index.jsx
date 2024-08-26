@@ -7,17 +7,21 @@ import OtpScreen from "../screens/OtpScreen";
 import ProfileScreen from "../screens/ProfileScreen";
 import HomeScreen from "../screens/HomeScreen";
 import CheckScreen from "../screens/CheckScreen";
+import { Provider } from 'react-redux';
+import store from "../store.js";
 const Stack = createNativeStackNavigator();
 export default App = () => {
     return (
+        <Provider store={store}>
 
-        <Stack.Navigator initialRouteName="Walthrough">
-            <Stack.Screen name="Walkthrough" component={WalkthroughScreen} options={{ headerShown: false }} />
-            <Stack.Screen name="Verification" component={VerificationScreen} options={{ headerShown: false }} />
-            <Stack.Screen name="OTP" component={OtpScreen} options={{ headerShown: false }} />
-            <Stack.Screen name="Profile" component={ProfileScreen} options={{ headerShown: false }} />
-            <Stack.Screen name="Home" component={HomeScreen} options={{ headerShown: false }} />
-            <Stack.Screen name="CheckScreen" component={CheckScreen} options={{ headerShown: false }} />
-        </Stack.Navigator>
+            <Stack.Navigator initialRouteName="Walthrough">
+                <Stack.Screen name="Walkthrough" component={WalkthroughScreen} options={{ headerShown: false }} />
+                <Stack.Screen name="Verification" component={VerificationScreen} options={{ headerShown: false }} />
+                <Stack.Screen name="OTP" component={OtpScreen} options={{ headerShown: false }} />
+                <Stack.Screen name="Profile" component={ProfileScreen} options={{ headerShown: false }} />
+                <Stack.Screen name="Home" component={HomeScreen} options={{ headerShown: false }} />
+                <Stack.Screen name="CheckScreen" component={CheckScreen} options={{ headerShown: false }} />
+            </Stack.Navigator>
+        </Provider>
     );
 };

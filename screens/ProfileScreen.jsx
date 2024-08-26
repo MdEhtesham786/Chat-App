@@ -2,20 +2,30 @@ import { Text, View, SafeAreaView, TouchableOpacity, StyleSheet, Image, TextInpu
 import BackButton from "../components/BackButton";
 import profileImg from "../assets/images/profile.png";
 import axios from "../utils/axiosConfig";
+import * as SecureStore from 'expo-secure-store';
 
 import { useEffect, useState } from "react";
 export default ProfileScreen = ({ navigation, route }) => {
-      axios.defaults.withCredentials = true; //The most important line for cookies
+    axios.defaults.withCredentials = true; //The most important line for cookies
 
-    const { user } = route.params;
     const [formData, setFormdata] = useState({ firstname: '', lastname: '' });
     const [disable, setDisable] = useState(true);
+    const [token, setToken] = useState('');
     const [isLoading, setIsLoading] = useState(false);
+    const save = async (key, value) => {
+        await SecureStore.setItemAsync(key, value);
+
+    };
+    const getValueFor = async (key) => {
+        let result = await SecureStore.getItemAsync(key);
+        setToken(result);
+    };
     const handleSaveButton = async () => {
         try {
             setDisable(true);
             setIsLoading(true);
-            let res = await axios.post('/auth/add-profile', { data: formData, user });
+            console.log(token, 'compulsory hona chahiye');
+            let res = await axios.post('/auth/add-profile', { data: formData, token });
             if (res.data.success) {
                 navigation.replace('Home', { user: res.data.user });
             } else {
@@ -24,7 +34,7 @@ export default ProfileScreen = ({ navigation, route }) => {
             setIsLoading(false);
             setDisable(false);
         } catch (err) {
-            console.log(err);
+            console.log(err.response.data.error);
             setIsLoading(false);
             setDisable(false);
 
@@ -47,6 +57,10 @@ export default ProfileScreen = ({ navigation, route }) => {
 
 
     };
+    useEffect(() => {
+        getValueFor('token');
+        console.log(token, 'pehle run ho gaya ');
+    }, []);
     useEffect(() => {
         const backAction = () => {
             // You can customize this action, maybe show an alert to confirm exit

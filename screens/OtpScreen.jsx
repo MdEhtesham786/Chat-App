@@ -1,10 +1,14 @@
 import { useState, useRef, useEffect } from "react";
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, ActivityIndicator, SafeAreaView } from "react-native";
 import axios from "../utils/axiosConfig";
-
+import * as SecureStore from 'expo-secure-store';
+import { useDispatch, useSelector } from "react-redux";
+import { setIsLoggedIn, setUser } from "../reducer/authSlice.js";
 import BackButton from "../components/BackButton";
+
 export default VerificationScreen = ({ navigation, route }) => {
-      axios.defaults.withCredentials = true; //The most important line for cookies
+    axios.defaults.withCredentials = true; //The most important line for cookies
+    const dispatch = useDispatch();
 
     const [otp, setOTP] = useState([]);
     const [disable, setDisable] = useState(true);
@@ -33,20 +37,22 @@ export default VerificationScreen = ({ navigation, route }) => {
     const handleVerifyButton = async () => {
         try {
             if (otp) {
-                console.log(user);
                 setDisable(true);
                 setIsLoading(true);
                 setOTP([]);
-
                 let res = await axios.post('/auth/verify-otp', { data: otp, user });
-                if (res.data.success) {
-                    if (res.data.hasProfile) {
-                        navigation.replace('Home', { user: res.data.user });
+                const { data } = res;
+                if (data.success) {
+                    save('token', data.token);
+                    dispatch(setIsLoggedIn(data.success));
+                    dispatch(setUser(data.user));
+                    if (data.hasProfile) {
+                        navigation.replace('Home');
                     } else {
-                        navigation.replace('Profile', { user: res.data.user });
+                        navigation.replace('Profile');
                     }
                 } else {
-                    console.log(res.data);
+                    console.log(data);
                 }
                 // console.log(res.data);
                 // navigation.navigate('OTP');
@@ -92,6 +98,14 @@ export default VerificationScreen = ({ navigation, route }) => {
             setIsLoading(false);
             setDisable(false);
         }
+    };
+    const save = async (key, value) => {
+        await SecureStore.setItemAsync(key, value);
+
+    };
+    const getValueFor = async (key) => {
+        let result = await SecureStore.getItemAsync(key);
+        return result;
     };
     const input1Ref = useRef(null);
     const input2Ref = useRef(null);
@@ -197,8 +211,8 @@ const styles = StyleSheet.create({
     },
     input: {
         // backgroundColor: '#EDEDED',
-        height: 35,
-        width: 35,
+        height: 40,
+        width: 40,
         // borderRadius: 50,
         // padding: 8,
         fontSize: 34,
