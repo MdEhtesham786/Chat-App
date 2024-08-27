@@ -1,12 +1,13 @@
-import { View, Text, SafeAreaView, Platform, StyleSheet, StatusBar, Image, TouchableOpacity, ActivityIndicator } from "react-native";
+import { View, Text, SafeAreaView, Platform, StyleSheet, StatusBar, Image, TouchableOpacity, ActivityIndicator, Animated } from "react-native";
 // import axios from "../utils/axiosConfig";
 import axios from "../utils/axiosConfig.js";
 import * as SecureStore from 'expo-secure-store';
 import image1 from "../assets/images/image1.png";
 import image2 from "../assets/images/image2.png";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { setIsLoggedIn, setUser } from "../reducer/authSlice.js";
+import Logo from "../assets/images/image.png";
 export default WalkthroughScreen = ({ navigation, route }) => {
     axios.defaults.withCredentials = true; //The most important line for cookies
     //Redux State
@@ -14,28 +15,32 @@ export default WalkthroughScreen = ({ navigation, route }) => {
     const user = useSelector((state) => state.auth.user);
     const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
     const [loading, setLoading] = useState(true);
-    const [token, setToken] = useState('');
     const getValueFor = async (key) => {
         let result = await SecureStore.getItemAsync(key);
-        setToken(result);
+        return result;
     };
-    const fetchData = async () => {
+    const fetchData = async (token) => {
         try {
-            const res = await axios.post(`/auth/islogin`, { token });
-            const { data } = res;
-            if (data.success) {
-                if (data.user) {
-                    dispatch(setIsLoggedIn(data.success));
-                    dispatch(setUser(data.user));
-                    if (data.hasProfile) {
-                        navigation.navigate("Home");
-                    } else {
-                        navigation.navigate("Profile");
+            if (token) {
+                const res = await axios.post(`/auth/islogin`, { token });
+                const { data } = res;
+                if (data.success) {
+                    if (data.user) {
+                        dispatch(setIsLoggedIn(data.success));
+                        dispatch(setUser(data.user));
+                        if (data.hasProfile) {
+                            navigation.navigate("Home");
+                        } else {
+                            navigation.navigate("Profile");
+                        }
                     }
+                } else {
+                    setLoading(false);
                 }
             } else {
                 setLoading(false);
             }
+
         } catch (err) {
             console.log(err.response.data.error);
             setLoading(false);
@@ -43,19 +48,19 @@ export default WalkthroughScreen = ({ navigation, route }) => {
         }
     };
     useEffect(() => {
-        getValueFor('token');
+        getValueFor('token').then((token) => fetchData(token)).catch(err => console.log(err));
     }, []);
+
+    const fadeAnim = useRef(new Animated.Value(0)).current;
     useEffect(() => {
-        if (token) {
-            fetchData();
-        } else {
-            setTimeout(() => {
-                setLoading(false);
-            }, 500);
-        }
-    }, [token]);
+        Animated.timing(fadeAnim, {
+            toValue: 1, // Fade to opacity 1 (visible)
+            duration: 1000, // Duration in milliseconds
+            useNativeDriver: true, // Use native driver for better performance
+        }).start();
+    }, [fadeAnim]);
     return (
-        loading ? <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}><ActivityIndicator color={'blue'} size={60} /></View> :
+        loading ? <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'white' }}><Animated.Image source={Logo} style={{ height: 80, width: 300, opacity: fadeAnim }} resizeMode="contain" /></View> :
             <SafeAreaView style={styles.container} >
                 <View style={styles.imageContainer}>
                     <Image style={styles.image1} source={image1} resizeMode="contain" />

@@ -1,17 +1,31 @@
-import { Text, SafeAreaView, StyleSheet, BackHandler, Alert, TouchableOpacity } from "react-native";
+import { Text, SafeAreaView, StyleSheet, BackHandler, Alert, TouchableOpacity, View, Image, TextInput, FlatList } from "react-native";
 import BackButton from "../components/BackButton";
 import { useState, useEffect } from "react";
 import * as SecureStore from 'expo-secure-store';
 import { useDispatch, useSelector } from "react-redux";
 import { setIsLoggedIn, setUser } from "../reducer/authSlice.js";
 import axios from "../utils/axiosConfig.js";
+import image from "../assets/images/image.png";
+import ChatBox from "../components/ChatBox.jsx";
 export default HomeScreen = ({ navigation, route }) => {
     axios.defaults.withCredentials = true; //The most important line for cookies
     const dispatch = useDispatch();
     const [disable, setDisable] = useState(true);
     const [isLoading, setIsLoading] = useState(false);
-    const [name, setName] = useState('');
+    const [search, setSearch] = useState('');
     const user = useSelector((state) => state.auth.user);
+    let demoArr = [
+
+    ];
+    let obj = {
+        avatar: image,
+        name: 'Ehtesham Shaikh',
+        latestMessage: 'Hello'
+    };
+    for (let i = 0; i < 20; i++) {
+        demoArr.push(obj);
+
+    }
     const logoutAlert = () => {
         Alert.alert('Confirmation', 'Are you sure you want to Logout?', [
             {
@@ -32,6 +46,14 @@ export default HomeScreen = ({ navigation, route }) => {
             console.log('Successfully Logged Out');
         } catch (err) {
             console.log(err.response.data.err);
+        }
+    };
+    const handleSearchInput = (text) => {
+        setSearch(text);
+        if (text.length >= 5) {
+            setDisable(false);
+        } else {
+            setDisable(true);
         }
     };
     useEffect(() => {
@@ -56,10 +78,23 @@ export default HomeScreen = ({ navigation, route }) => {
     }, []);
     return (
         <SafeAreaView style={styles.container}>
-            <Text style={{ fontSize: 20, textAlign: 'center' }}>Hello {user?.firstname + " " + user?.lastname}</Text>
+            <View style={styles.header} >
+                <Text style={styles.headerText}>Home</Text>
+            </View>
+            <View style={styles.inputContainer}>
+                <TextInput style={styles.input} value={search} placeholder="Search" placeholderTextColor={'#ADB5BD'} onChangeText={(text) => handleSearchInput(text)} />
+            </View>
+            <View style={styles.listContainer}>
+                <FlatList
+                    data={demoArr}
+                    renderItem={({ item }) => { return <ChatBox avatar={item.avatar} name={item.name} latestMessage={item.latestMessage} />; }}
+                    ItemSeparatorComponent={<View style={{ height: 15 }}></View>}
+                />
+            </View>
+            {/* <Text style={{ fontSize: 20, textAlign: 'center' }}>Hello {user?.firstname + " " + user?.lastname}</Text>
             <TouchableOpacity onPress={logoutAlert} >
                 <Text>Log out</Text>
-            </TouchableOpacity>
+            </TouchableOpacity> */}
         </SafeAreaView>
     );
 };
@@ -67,5 +102,38 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: 'white'
+    },
+    header: {
+        // backgroundColor: 'red',
+        height: 50,
+        justifyContent: 'center',
+        paddingHorizontal: 20
+    },
+    headerText: {
+        fontSize: 20,
+
+    },
+    inputContainer: {
+        // backgroundColor: 'red',
+        height: 80,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginBottom: 15
+    },
+    input: {
+        backgroundColor: '#F7F7FC',
+        height: "55%",
+        width: "85%",
+        borderRadius: 7,
+        padding: 8,
+        fontSize: 16,
+    },
+    listContainer: {
+        // backgroundColor: 'red',
+        height: 600,
+        width: '95%',
+        // backgroundColor: 'blue',
+        marginHorizontal: 'auto',
+        paddingHorizontal: 10
     }
 });
