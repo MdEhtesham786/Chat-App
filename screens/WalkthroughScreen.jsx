@@ -7,7 +7,7 @@ import image2 from "../assets/images/image2.png";
 import { useEffect, useState, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { setIsLoggedIn, setUser } from "../reducer/authSlice.js";
-import Logo from "../assets/images/image.png";
+import Logo from "../assets/images/loadingImg.png";
 export default WalkthroughScreen = ({ navigation, route }) => {
     axios.defaults.withCredentials = true; //The most important line for cookies
     //Redux State

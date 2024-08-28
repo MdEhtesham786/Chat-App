@@ -1,139 +1,56 @@
-import { Text, SafeAreaView, StyleSheet, BackHandler, Alert, TouchableOpacity, View, Image, TextInput, FlatList } from "react-native";
-import BackButton from "../components/BackButton";
-import { useState, useEffect } from "react";
-import * as SecureStore from 'expo-secure-store';
-import { useDispatch, useSelector } from "react-redux";
-import { setIsLoggedIn, setUser } from "../reducer/authSlice.js";
-import axios from "../utils/axiosConfig.js";
-import image from "../assets/images/image.png";
-import ChatBox from "../components/ChatBox.jsx";
-export default HomeScreen = ({ navigation, route }) => {
-    axios.defaults.withCredentials = true; //The most important line for cookies
-    const dispatch = useDispatch();
-    const [disable, setDisable] = useState(true);
-    const [isLoading, setIsLoading] = useState(false);
-    const [search, setSearch] = useState('');
-    const user = useSelector((state) => state.auth.user);
-    let demoArr = [
 
-    ];
-    let obj = {
-        avatar: image,
-        name: 'Ehtesham Shaikh',
-        latestMessage: 'Hello'
-    };
-    for (let i = 0; i < 20; i++) {
-        demoArr.push(obj);
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import { Image, Text } from "react-native";
+import AboutScreen from './AboutScreen.jsx';
+import ChatScreen from './ChatScreen.jsx';
+import SettingsScreen from './SettingsScreen.jsx';
+import chatIcon from "../assets/images/chatIcon.png";
+import profileIcon from "../assets/images/profileIcon.png";
+import settingsIcon from "../assets/images/settingsIcon.png";
+const Tab = createBottomTabNavigator();
 
-    }
-    const logoutAlert = () => {
-        Alert.alert('Confirmation', 'Are you sure you want to Logout?', [
-            {
-                text: 'Cancel',
-                onPress: () => null,
-                style: 'cancel',
-            },
-            { text: 'YES', onPress: () => handleLogout() }
-        ]);
-    };
-
-    const handleLogout = async () => {
-        try {
-            await SecureStore.deleteItemAsync('token');
-            dispatch(setIsLoggedIn(false));
-            dispatch(setUser({}));
-            navigation.navigate('Verification');
-            console.log('Successfully Logged Out');
-        } catch (err) {
-            console.log(err.response.data.err);
-        }
-    };
-    const handleSearchInput = (text) => {
-        setSearch(text);
-        if (text.length >= 5) {
-            setDisable(false);
-        } else {
-            setDisable(true);
-        }
-    };
-    useEffect(() => {
-        const backAction = () => {
-            // You can customize this action, maybe show an alert to confirm exit
-            Alert.alert('Hold on!', 'Are you sure you want to exit the app?', [
-                {
-                    text: 'Cancel',
-                    onPress: () => null,
-                    style: 'cancel',
-                },
-                { text: 'YES', onPress: () => BackHandler.exitApp() }, // Exits the app
-            ]);
-            return true;
-        };
-        const backHandler = BackHandler.addEventListener(
-            'hardwareBackPress',
-            backAction,
-        );
-
-        return () => backHandler.remove();
-    }, []);
+export default HomeScreen = () => {
     return (
-        <SafeAreaView style={styles.container}>
-            <View style={styles.header} >
-                <Text style={styles.headerText}>Home</Text>
-            </View>
-            <View style={styles.inputContainer}>
-                <TextInput style={styles.input} value={search} placeholder="Search" placeholderTextColor={'#ADB5BD'} onChangeText={(text) => handleSearchInput(text)} />
-            </View>
-            <View style={styles.listContainer}>
-                <FlatList
-                    data={demoArr}
-                    renderItem={({ item }) => { return <ChatBox avatar={item.avatar} name={item.name} latestMessage={item.latestMessage} />; }}
-                    ItemSeparatorComponent={<View style={{ height: 15 }}></View>}
-                />
-            </View>
-            {/* <Text style={{ fontSize: 20, textAlign: 'center' }}>Hello {user?.firstname + " " + user?.lastname}</Text>
-            <TouchableOpacity onPress={logoutAlert} >
-                <Text>Log out</Text>
-            </TouchableOpacity> */}
-        </SafeAreaView>
+        <Tab.Navigator initialRouteName="chat" screenOptions={({ route }) => ({
+            tabBarStyle: { height: 80 },
+            tabBarIcon: ({ focused, color, size }) => {
+                let iconSource;
+                // Determine the icon based on the route name
+                switch (route.name) {
+                    case 'profile':
+                        iconSource = profileIcon;
+                        break;
+                    case 'chat':
+                        iconSource = chatIcon;
+                        break;
+                    case 'settings':
+                        iconSource = settingsIcon;
+                        break;
+                    default:
+                        iconSource = null;
+                }
+                size = 40;
+                return (
+                    <Image
+                        source={iconSource}
+                        style={{ width: size, height: size, tintColor: color }}
+                    />
+                );
+            },
+            tabBarLabel: ({ focused, color }) => {
+                // Display text labels for all tabs
+                if (route.name === 'profile') {
+                    return <Text style={{ color: focused ? 'tomato' : color }}>Profile</Text>;
+                } else if (route.name === 'chat') {
+                    return <Text style={{ color: focused ? 'tomato' : color }}>Chats</Text>;
+                } else if (route.name === 'settings') {
+                    return <Text style={{ color: focused ? 'tomato' : color }}>Settings</Text>;
+                }
+            },
+        })} >
+            <Tab.Screen name="profile" component={AboutScreen} options={{ headerShown: false }} />
+            <Tab.Screen name="chat" component={ChatScreen} options={{ headerShown: false }} />
+            <Tab.Screen name="settings" component={SettingsScreen} options={{ headerShown: false }} />
+        </Tab.Navigator>
     );
 };
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: 'white'
-    },
-    header: {
-        // backgroundColor: 'red',
-        height: 50,
-        justifyContent: 'center',
-        paddingHorizontal: 20
-    },
-    headerText: {
-        fontSize: 20,
-
-    },
-    inputContainer: {
-        // backgroundColor: 'red',
-        height: 80,
-        justifyContent: 'center',
-        alignItems: 'center',
-        marginBottom: 15
-    },
-    input: {
-        backgroundColor: '#F7F7FC',
-        height: "55%",
-        width: "85%",
-        borderRadius: 7,
-        padding: 8,
-        fontSize: 16,
-    },
-    listContainer: {
-        // backgroundColor: 'red',
-        height: 600,
-        width: '95%',
-        // backgroundColor: 'blue',
-        marginHorizontal: 'auto',
-        paddingHorizontal: 10
-    }
-});

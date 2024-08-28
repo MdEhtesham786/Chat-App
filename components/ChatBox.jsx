@@ -1,15 +1,18 @@
-import { Text, View, StyleSheet, Image, TouchableOpacity } from "react-native";
-import image from "../assets/images/icon.png";
+import { Text, View, StyleSheet, Image, TouchableOpacity, Pressable, TouchableHighlight, TouchableNativeFeedback } from "react-native";
+// import image from "../assets/images/icon.png";
 
 export default ChatBox = ({ avatar, name, latestMessage }) => {
     return (
-        <TouchableOpacity style={styles.box}>
-            <Image style={styles.img} source={image} />
-            <View style={styles.textContainer}>
-                <Text style={styles.name}>{name}</Text>
-                <Text style={styles.latestMessage}>{latestMessage}</Text>
+        <TouchableNativeFeedback >
+            <View style={styles.box}>
+                <Image style={styles.img} source={avatar} />
+                <View style={styles.textContainer}>
+                    <Text style={styles.name}>{name}</Text>
+                    <Text style={styles.latestMessage}>{latestMessage}</Text>
+                </View>
             </View>
-        </TouchableOpacity>
+
+        </TouchableNativeFeedback>
     );
 };
 const styles = StyleSheet.create({
@@ -17,10 +20,10 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         height: 80,
         width: '100%',
-        // alignItems: 'center',
-        marginHorizontal: "auto",
-        borderColor: '#EDEDED',
-        borderBottomWidth: 1,
+        marginHorizontal: 'auto',
+        paddingLeft: 20,
+        // backgroundColor: 'green',
+        alignItems: 'center'
     },
     textContainer: {
         // backgroundColor: 'orange',
@@ -29,8 +32,8 @@ const styles = StyleSheet.create({
         paddingVertical: 5
     },
     img: {
-        height: 60,
-        width: 60,
+        height: 55,
+        width: 55,
         borderRadius: 15
     },
     name: {

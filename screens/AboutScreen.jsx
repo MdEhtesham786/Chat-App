@@ -5,14 +5,18 @@ import axios from "../utils/axiosConfig";
 import * as SecureStore from 'expo-secure-store';
 import { useDispatch, useSelector } from "react-redux";
 import { setIsLoggedIn, setUser } from "../reducer/authSlice.js";
+
 import { useEffect, useState } from "react";
 export default ProfileScreen = ({ navigation, route }) => {
+
+    const user = useSelector((state) => state.auth.user);
     axios.defaults.withCredentials = true; //The most important line for cookies
 
-    const [formData, setFormdata] = useState({ firstname: '', lastname: '' });
+    const [formData, setFormdata] = useState({ firstname: user?.firstname || '', lastname: user?.lastname || '' });
     const [disable, setDisable] = useState(true);
     const [token, setToken] = useState('');
     const [isLoading, setIsLoading] = useState(false);
+    const dispatch = useDispatch();
     const save = async (key, value) => {
         await SecureStore.setItemAsync(key, value);
 
@@ -25,13 +29,16 @@ export default ProfileScreen = ({ navigation, route }) => {
         try {
             setDisable(true);
             setIsLoading(true);
-            let res = await axios.post('/auth/add-profile', { data: formData, token });
-            if (res.data.success) {
+            let res = await axios.post('/auth/update-profile', { data: formData, token });
+            const { data } = res;
+            if (data.success) {
                 dispatch(setIsLoggedIn(data.success));
                 dispatch(setUser(data.user));
-                navigation.replace('Home', { user: res.data.user });
+                navigation.replace('Home');
             } else {
-                console.log('err', res.data);
+                console.log('err', data);
+                setIsLoading(false);
+                setDisable(false);
             }
             setIsLoading(false);
             setDisable(false);
@@ -60,8 +67,10 @@ export default ProfileScreen = ({ navigation, route }) => {
 
     };
     useEffect(() => {
+        if (user?.firstname) {
+            setDisable(false);
+        }
         getValueFor('token');
-        console.log(token, 'pehle run ho gaya ');
     }, []);
     useEffect(() => {
         const backAction = () => {
