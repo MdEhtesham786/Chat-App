@@ -112,8 +112,9 @@ const MessageScreen = ({ navigation, route }) => {
                     const { data } = res;
                     if (data.success) {
 
+                        console.log('behenchod ',chat.chatOwnersID);
                         let friendID = chat.chatOwnersID.filter((id) => id !== user._id);
-                        fetchChat();// this helps the user see his own message in chat ISKO TO DEKH LUGA BAADME
+                        fetchChat();// this helps the user see his own message 
                         socket.emit('sendMessage', friendID, data.notificationMessage, (response) => {
                             console.log(response);
                         });

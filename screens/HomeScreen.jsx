@@ -193,7 +193,10 @@ const HomeScreen = () => {
             console.log(err);
         }
     };
-    useEffect(() => {
+
+
+//Initialize Socket
+ useEffect(() => {
         if (!socketRef.current) {
             socketRef.current = initializeSocket(socketURL);
         }
@@ -204,38 +207,64 @@ const HomeScreen = () => {
             }
         };
     }, []);
+// Handle socket connection and online user update
+useEffect(() => {
+  if (!socketRef.current) return;
+
+  const socket = socketRef.current;
+  const handleConnect = () => {
+    console.log("Socket connected:", socket.id);
+    if (user?._id) {
+      socket.emit("login", user._id)
+    }
+  };
+
+  socket.on("connect", handleConnect);
+  return () => {
+    socket.off("connect", handleConnect);
+  };
+}, [user?._id]);
+
+// Handles network changes
     useEffect(() => {
+  if (!socketRef.current) return;
 
-        if (memoizedNetInfo.isConnected === null) {
-            return;
-        }
-        if (memoizedNetInfo.isConnected && !isSocketInitialized.current) {
-            console.log('App is online. Reconnecting socket...');
-            reconnectSocket(); //
-            socketRef.current.emit("login", user._id);
-            isSocketInitialized.current = true;
-        } else if (!memoizedNetInfo.isConnected) {
-            console.log('App is offline. Disconnecting socket...');
-            disconnectSocket(); //
-            isSocketInitialized.current = false;
-        }
-    }, [memoizedNetInfo.isConnected]);
-    useEffect(() => {
-        console.log('on');
-        socketRef.current.on('updatePendingRequest', (res) => {
-            if (res) {
-                console.log('update hua');
+  if (memoizedNetInfo.isConnected) {
+    console.log("App is online. Reconnecting socket...");
+    isSocketInitialized.current = true;
 
-                fetchPendingRequest();
-            } else {
-                console.log(res);
-            }
-        });
+    reconnectSocket();
+  } else {
+    console.log("App is offline. Disconnecting socket...");
+    disconnectSocket(); // or socketRef.current.disconnect()
+    isSocketInitialized.current = false;
+  }
+}, [memoizedNetInfo.isConnected]);
 
-        return () => {
-            socketRef.current.off('updatePendingRequest');
-        };
-    }, [socketRef.current]);
+
+useEffect(() => {
+  if (!socketRef.current) return;    // <-- this line is the difference
+  const socket = socketRef.current;
+
+  console.log("Registering updatePendingRequest listener");
+
+  const handler = (res) => {
+    if (res) {
+      console.log("update hua");
+      fetchPendingRequest();
+    } else {
+      console.log(res);
+    }
+  };
+
+  socket.on("updatePendingRequest", handler);
+
+  return () => {
+    socket.off("updatePendingRequest", handler);
+  };
+}, []);
+// or: [user?._id]
+
     const isFocused = useIsFocused(); // Check if the screen is focused
     useEffect(() => {
         if (!isFocused) return;

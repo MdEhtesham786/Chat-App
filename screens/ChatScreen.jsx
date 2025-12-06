@@ -1,18 +1,21 @@
 import { Text, SafeAreaView, StyleSheet, BackHandler, Alert, TouchableOpacity, View, Image, TextInput, FlatList, Pressable } from "react-native";
 import BackButton from "../components/BackButton";
 import addFriend from "../assets/images/addFriend.png";
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import * as SecureStore from 'expo-secure-store';
 import { useDispatch, useSelector } from "react-redux";
 import { setFriendList, setIsLoggedIn, setUser } from "../reducer/authSlice.js";
 import axios from "../utils/axiosConfig.js";
 import ChatBox from "../components/ChatBox.jsx";
+
+
+
+
 import { useFocusEffect, } from "@react-navigation/native";
 import { setChat } from "../reducer/chatSlice.js";
 import { use } from "react";
 
 const ChatScreen = ({ navigation, route }) => {
-
 
     axios.defaults.withCredentials = true; //The most important line for cookies
     const dispatch = useDispatch();
@@ -54,9 +57,10 @@ const ChatScreen = ({ navigation, route }) => {
     };
     useFocusEffect(
         useCallback(() => {
+      
+                                fetchFriendList();
+                                setChat({});
 
-            fetchFriendList();
-            setChat({});
         }, [])
     );
 

@@ -53,6 +53,9 @@ const VerificationScreen = ({ navigation }) => {
             setDisable(false);
         }
     };
+
+
+
     const isFocused = useIsFocused(); // Check if the screen is focused
 
     useEffect(() => {
