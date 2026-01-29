@@ -1,5 +1,6 @@
-import { Text, SafeAreaView, StyleSheet, BackHandler, Alert, TouchableOpacity, View, Image, TextInput, FlatList, Pressable } from "react-native";
+import { Text,StyleSheet, BackHandler, Alert, Platform,TouchableOpacity, View, Image, TextInput, FlatList, Pressable } from "react-native";
 import BackButton from "../components/BackButton";
+
 import addFriend from "../assets/images/addFriend.png";
 import { useState, useEffect, useCallback, useRef } from "react";
 import * as SecureStore from 'expo-secure-store';
@@ -14,6 +15,7 @@ import ChatBox from "../components/ChatBox.jsx";
 import { useFocusEffect, } from "@react-navigation/native";
 import { setChat } from "../reducer/chatSlice.js";
 import { use } from "react";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 const ChatScreen = ({ navigation, route }) => {
 
@@ -37,7 +39,6 @@ const ChatScreen = ({ navigation, route }) => {
         try {
             let res = await axios.post('/friendList', { userID: user._id });
             const { data } = res;
-            // console.log(data.friendList);
             if (data.success) {
                 dispatch(setFriendList(data.friendList));
             } else {
@@ -66,9 +67,9 @@ const ChatScreen = ({ navigation, route }) => {
 
     return (
 
-        <SafeAreaView style={styles.container}>
+        <SafeAreaView style={styles.container} edges={Platform.OS === "android" ? ["top", "bottom"] : ["bottom"]}>
             <View style={styles.header} >
-                <Text style={styles.headerText}>Home</Text>
+                <Text style={styles.headerText}>Chats</Text>
                 <Pressable onPress={handleAddFriend} style={{ backgroundColor: '', flexDirection: 'row' }}>
                     {pendingRequest.length > 0 && <Text style={{ color: 'blue' }}>{pendingRequest.length}</Text>}
                     <Image style={styles.addFriend} source={addFriend} />
@@ -104,23 +105,25 @@ const styles = StyleSheet.create({
         paddingHorizontal: 20
     },
     addFriend: {
-        height: 30,
-        width: 30
+        height: 37,
+        width: 37
     },
     headerText: {
-        fontSize: 20,
-        width: 60,
+        fontSize: 27,
+        width: 75,
+        fontWeight: '600'
 
     },
     inputContainer: {
         height: 80,
         justifyContent: 'center',
         alignItems: 'center',
+        // backgroundColor: 'red'
     },
     input: {
         backgroundColor: '#F7F7FC',
         height: "55%",
-        width: "85%",
+        width: "90%",
         borderRadius: 7,
         padding: 8,
         fontSize: 16,

@@ -12,6 +12,7 @@ import HomeScreen from "../screens/HomeScreen";
 import CheckScreen from "../screens/CheckScreen";
 import MessageScreen from "../screens/MessageScreen";
 import AddFriendScreen from "../screens/AddFriendScreen";
+// import { SafeAreaProvider } from "react-native-safe-area-context";
 // import FlashMessage from "react-native-flash-message";
 
 // function App() {

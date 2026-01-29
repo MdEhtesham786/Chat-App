@@ -12,7 +12,7 @@ import SearchUsersBox from "../components/SearchUsersBox.jsx";
 import PendingRequestBox from "../components/PendingRequestBox.jsx";
 import { getSocket } from '../utils/socketService';  // Import socketService
 import { useFocusEffect } from "@react-navigation/native";
-
+import { Keyboard } from "react-native";
 
 const AddFriendScreen = ({ navigation, route }) => {
     const socket = getSocket();  // Get the already initialized socket instance
@@ -49,6 +49,9 @@ const AddFriendScreen = ({ navigation, route }) => {
 
     const handleSearchButton = async (search) => {
         try {
+            console.log(search.length==0)
+            if(!search.length==0){
+                  Keyboard.dismiss();
             let res = await axios.post('/searchUsers', { searchUsers: search }).catch((err) => console.log(err));
             const { data } = res;
             if (data.success) {
@@ -56,6 +59,8 @@ const AddFriendScreen = ({ navigation, route }) => {
             } else {
                 console.log('err', data);
             }
+        }
+
         } catch (err) {
             console.log(err);
 
@@ -70,7 +75,10 @@ const AddFriendScreen = ({ navigation, route }) => {
     return (
 
         <SafeAreaView style={styles.container}>
+            <View style={styles.heading}>
             <BackButton />
+            <Text style={styles.headingText}>Add Friends</Text>
+            </View>
             <View style={styles.inputContainer}>
                 <TextInput style={styles.input} value={search} placeholder="Search Friends" placeholderTextColor={'#ADB5BD'} onChangeText={(text) => handleSearchInput(text)} />
                 <Pressable style={styles.searchButton} onPress={() => handleSearchButton(search)} >
@@ -84,7 +92,7 @@ const AddFriendScreen = ({ navigation, route }) => {
                         data={searchUsers}
                         renderItem={({ item }) => { return <SearchUsersBox fetchPendingRequest={fetchPendingRequest} userID={user._id} friendID={item._id} avatar={item.avatar} name={item.firstname + ' ' + item.lastname} />; }}
                         showsVerticalScrollIndicator={false}
-                    /> : <Text style={styles.header}> No users found</Text>}
+                    /> : <Text style={styles.header}> Find your friends</Text>}
 
             </View>
             <View style={styles.pendingRequestResults}>
@@ -101,15 +109,27 @@ const AddFriendScreen = ({ navigation, route }) => {
 };
 export default AddFriendScreen;
 const styles = StyleSheet.create({
+
     container: {
         flex: 1,
         backgroundColor: 'white'
     },
+    heading:{
+justifyContent:"flex-start",
+alignItems:'center',
+flexDirection:'row',
+paddingHorizontal:10,
+    },
+    headingText:{
+         fontWeight: '600',
+fontSize:27,
+    },
     inputContainer: {
         height: 80,
+        paddingHorizontal: 15,
         justifyContent: 'space-evenly',
         alignItems: 'center',
-        flexDirection: 'row'
+        flexDirection: 'row',
     },
     input: {
         backgroundColor: '#F7F7FC',

@@ -22,6 +22,7 @@ const ChatBox = ({ avatar, name, friendID, userID }) => {
                     const { data } = res;
                     if (data.success) {
                         // console.log(data.unreadMessage);
+                        console.log(data)
                         setLatestMessage(data.latestMessage);
                         setUnreadMessage(data.unreadMessage);
                         setSenderID(data.senderID);
@@ -63,7 +64,12 @@ const ChatBox = ({ avatar, name, friendID, userID }) => {
     return (
         <TouchableNativeFeedback    onPress={() => navigation.navigate('Message', { userID, friendID, avatar })}>
             <View style={styles.box}>
+                <View style={styles.imgContainer}>
+
                 <Image style={styles.img} source={avatar ? { uri: avatar } : profilePic} />
+                </View>
+                <View style={styles.textInfoContainer}>
+
                 <View style={styles.textContainer}>
                     <Text style={styles.name}>{name}</Text>
                     <Text style={styles.latestMessage} numberOfLines={2} ellipsizeMode="tail ">{latestMessage ? latestMessage.message : 'Start a new conversation'}</Text>
@@ -80,6 +86,8 @@ const ChatBox = ({ avatar, name, friendID, userID }) => {
                     }
 
                 </View>
+                </View>
+
             </View>
 
         </TouchableNativeFeedback>
@@ -93,32 +101,41 @@ const styles = StyleSheet.create({
         width: '100%',
         marginHorizontal: 'auto',
         paddingLeft: 20,
-        // backgroundColor: 'green',
-        alignItems: 'center'
+        alignItems: 'center',
+    },
+    imgContainer:{
+        width: '15%',
+    }
+,
+    textInfoContainer:{
+         borderWidth: 0.5,
+        borderTopWidth: 0,
+        borderLeftWidth: 0,
+        borderColor: '#E9ECEF',
+        width: '85%',
+        justifyContent: 'space-between',
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingHorizontal: 15,
+        paddingVertical: 5,
+height: '100%'
+        
     },
     textContainer: {
-        // backgroundColor: 'orange',
-        paddingHorizontal: 15,
         width: '60%',
-        paddingVertical: 5
     },
     infoBox: {
-        // backgroundColor: 'blue',
         height: '82%',
-        width: '20%',
         alignItems: 'flex-end',
         justifyContent: 'space-between',
     },
     lastTime: {
         width: '100%',
-        // backgroundColor: 'red',
         height: '40%',
         alignItems: 'center',
         justifyContent: 'center',
-        // marginBottom: 5
     },
     unread: {
-        backgroundColor: 'blue',
         height: 25,
         width: 25,
         justifyContent: 'center',
@@ -134,11 +151,12 @@ const styles = StyleSheet.create({
     },
     name: {
         marginBottom: 10,
-        fontSize: 17,
+        fontSize: 18,
         fontWeight: '500',
         // backgroundColor: 'green'
     },
     latestMessage: {
-        fontSize: 15
+        fontSize: 15,
+        color: 'grey'
     }
 });

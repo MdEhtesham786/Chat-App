@@ -53,8 +53,6 @@ const AboutScreen = ({ navigation, route }) => {
             let localUri = imageResult;
             if (localUri === user?.avatar?.url) {
                 console.log('same image');
-                // console.log('local', localUri);
-                // console.log('user avatar', user?.avatar?.url);
                 setIsLoading(false);
                 setDisable(false);
             } else {
@@ -102,17 +100,14 @@ const AboutScreen = ({ navigation, route }) => {
     useEffect(() => {
         if (user?.avatar?.url) {
             setImage(user.avatar.url);
-            // console.log('Profile image updated from Redux:', user.avatar.url);
         }
     }, [user]);
     //changing profile pic if screen changes
     useFocusEffect(
         useCallback(() => {
             setImage(user?.avatar?.url);
-            // console.log(user?.avatar?.url);
             return () => {
                 setImage(user?.avatar?.url); // Reset image to user's avatar
-                // console.log('Screen unfocused');
             };
         }, [user])
     );
@@ -129,7 +124,6 @@ const AboutScreen = ({ navigation, route }) => {
             setDisable(true);
             setIsLoading(true);
             uploadImage(image);
-            // console.log('formdata', formData.firstname, formData.lastname);
             if (formData.firstname === user?.firstname && formData.lastname === user?.lastname) {
                 setIsLoading(false);
                 setDisable(false);

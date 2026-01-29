@@ -10,7 +10,7 @@ const SettingsScreen = ({ navigation }) => {
 
     const dispatch = useDispatch();
     const logoutAlert = () => {
-        Alert.alert('Confirmation', 'Wanna logout nigga?', [
+        Alert.alert('Confirmation', 'Are you sure you want to logout?', [
             {
                 text: 'Cancel',
                 onPress: () => null,

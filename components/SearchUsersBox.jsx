@@ -15,7 +15,7 @@ const SearchUsersBox = ({ avatar, name, userID, friendID, fetchPendingRequest })
     axios.defaults.withCredentials = true; //The most important line for cookies
     const handleAddFriend = async (userID, friendID) => {
         try {
-            Alert.alert('Add Friend', 'Are you sure you want to add this nigga?', [
+            Alert.alert('Add Friend', 'Send friend request?', [
                 {
                     text: 'Cancel',
                     onPress: () => null,

@@ -1,4 +1,5 @@
-import { Text, View, SafeAreaView, Pressable, TouchableWithoutFeedback, Keyboard, Platform, KeyboardAvoidingView, TouchableOpacity, StyleSheet, Image, TextInput, BackHandler, Alert, ActivityIndicator, FlatList } from "react-native";
+import { Text, View, Pressable, TouchableWithoutFeedback, Keyboard, Platform, KeyboardAvoidingView, TouchableOpacity, StyleSheet, Image, TextInput, BackHandler, Alert, ActivityIndicator, FlatList } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import BackButton from "../components/BackButton";
 import profileImg from "../assets/images/profile.png";
 import axios from "../utils/axiosConfig";
@@ -24,7 +25,8 @@ const MessageScreen = ({ navigation, route }) => {
     const currentChatOpen = useSelector((state) => state.chat.currentChatOpen);
     axios.defaults.withCredentials = true; //The most important line for cookies
     const [formData, setFormdata] = useState({ firstname: '', lastname: '' });
-    const [disable, setDisable] = useState(true);
+    const [disable, setDisable] = useState(false);
+    // const [disableSendButton, setDisableSendButton] = useState(true);
     const [token, setToken] = useState('');
     const [message, setMessage] = useState('');
     const [isLoading, setIsLoading] = useState(false);
@@ -79,7 +81,7 @@ const MessageScreen = ({ navigation, route }) => {
     };
     const handleRemoveFriend = async (friendID) => {
         try {
-            Alert.alert('Remove Friend', "Are you sure you want to remove this nigga from FriendList?", [
+            Alert.alert('Remove Friend', `Are you sure you want to remove ${chat?.friendName}?`, [
                 {
                     text: 'Cancel',
                     onPress: () => null,
@@ -107,12 +109,12 @@ const MessageScreen = ({ navigation, route }) => {
         try {
             if (chat._id && user._id && message) {
                 if (!message.length <= 0) {
+setDisable(true);
+
                     const res = await axios.post('/chat/send-message', { chatID: chat._id, senderID: user._id, message });
                     // console.log(chat);
                     const { data } = res;
                     if (data.success) {
-
-                        console.log('behenchod ',chat.chatOwnersID);
                         let friendID = chat.chatOwnersID.filter((id) => id !== user._id);
                         fetchChat();// this helps the user see his own message 
                         socket.emit('sendMessage', friendID, data.notificationMessage, (response) => {
@@ -123,9 +125,15 @@ const MessageScreen = ({ navigation, route }) => {
                         });
                         setMessage('');
                         console.log('Message sent');
+
+setDisable(false);
                     } else {
                         console.log(data);
+setDisable(false);
+
                     }
+                 
+
                 }
             } else {
                 console.log(chat._id, user._id, message);
@@ -134,21 +142,25 @@ const MessageScreen = ({ navigation, route }) => {
             console.log('err', err);
         }
     };
-    const [keyboardOffset, setKeyboardOffset] = useState(Platform.OS === 'ios' ? 60 : 30);
-    useEffect(() => {
-        const showSubscription = Keyboard.addListener('keyboardDidShow', (e) => {
-            // you can adjust the offset based on keyboard height or fixed number
-            setKeyboardOffset(Platform.OS === 'ios' ? 60 : 30);
-        });
-        const hideSubscription = Keyboard.addListener('keyboardDidHide', () => {
-            setKeyboardOffset(Platform.OS === 'ios' ? 60 : 0);
-        });
+  const [behavior, setBehavior] = useState(
+  Platform.OS === "ios" ? "padding" : undefined
+);
 
-        return () => {
-            showSubscription.remove();
-            hideSubscription.remove();
-        };
-    }, []);
+useEffect(() => {
+  const showSub = Keyboard.addListener("keyboardDidShow", () => {
+    setBehavior("padding"); // works for both
+  });
+
+  const hideSub = Keyboard.addListener("keyboardDidHide", () => {
+    setBehavior(Platform.OS === "ios" ? "padding" : undefined);
+  });
+
+  return () => {
+    showSub.remove();
+    hideSub.remove();
+  };
+}, []);
+
     useEffect(() => {
         socket.on('updateReceiveMessage', (res) => {
             if (res) {
@@ -170,14 +182,12 @@ const MessageScreen = ({ navigation, route }) => {
     }, []);
     useFocusEffect(useCallback(() => {
         readAllMessage();
-        // setCurrentChatOpen(chat?.chatOwnersID?.find((id) => id !== user._id));
-        console.log(chat.chatOwnersID, currentChatOpen, 'useeffect');
         console.log('all message read');
     }, []));
     return (
-        <SafeAreaView style={styles.container}>
-            <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-                keyboardVerticalOffset={keyboardOffset}
+        <SafeAreaView style={styles.container} edges={Platform.OS === "android" ? ["top", "bottom"] : [""]}>
+            <KeyboardAvoidingView behavior={behavior}
+                keyboardVerticalOffset={Platform.OS === 'ios' ? 58 : 0}
                 style={{ flex: 1 }}
             >
                 <View style={styles.messageHeader}>
@@ -200,7 +210,6 @@ const MessageScreen = ({ navigation, route }) => {
                     </View>
                 </View>
                 <View style={styles.messageContainer}>
-
                     {chat && chat.messageData && chat.messageData.length > 0 ? (
                         <FlatList keyboardShouldPersistTaps="handled"
                             data={chat.messageData}
@@ -210,11 +219,11 @@ const MessageScreen = ({ navigation, route }) => {
                                     ? { borderBottomRightRadius: 0 }
                                     : { borderBottomLeftRadius: 0 };
                                 return (
-                                    <View key={item._id} style={{ ...styles.messageBox, ...dynamicBorderRadius, alignSelf: item.author === user._id ? 'flex-end' : 'flex-start' }}>
-                                        <Text style={{ fontSize: 18, color: 'white', marginTop: 3 }}>
+                                    <View key={item._id} style={{ ...styles.messageBox, ...dynamicBorderRadius,backgroundColor:item.author===user._id? '#375FFF':'#ffffff' , alignSelf: item.author === user._id ? 'flex-end' : 'flex-start' }}>
+                                        <Text style={{ fontSize: 17, color:item.author === user._id ? 'white':'black',paddingRight:10}}>
                                             {item.message}
                                         </Text>
-                                        <Text style={{ alignSelf: 'flex-end', marginTop: 3, fontSize: 12 }}>{formattedTime}</Text>
+                                        <Text style={{ alignSelf: 'flex-end', fontSize: 11, color:item.author === user._id ? 'white':'grey'  }}>{formattedTime}</Text>
                                     </View>
                                 );
                             }}
@@ -227,17 +236,18 @@ const MessageScreen = ({ navigation, route }) => {
                 </View>
                 <View style={styles.inputContainer}>
                     <TextInput style={styles.messageInput} keyboardType="default" multiline={true} value={message} onChangeText={setMessage} placeholder="Type a Message" />
-                    <Pressable style={{ marginLeft: '3%', }} onPress={() => sendMessage()}><Image source={sendIcon} style={{ height: 35, width: 35, marginBottom: 7 }} /></Pressable>
+                    <Pressable disabled={disable} style={{ marginLeft: '3%', }} onPress={() => sendMessage()}><Image source={sendIcon} style={{ height: 35, width: 35, marginBottom: 7 }} /></Pressable>
                 </View>
             </KeyboardAvoidingView>
-        </SafeAreaView>
+    </SafeAreaView> 
     );
 };
 
 export default MessageScreen;
 const styles = StyleSheet.create({
     container: {
-        flex: 1
+        flex: 1,
+        backgroundColor:'#f7f7fc'
     },
     messageHeader: {
         backgroundColor: '#FFFFFF',
@@ -270,13 +280,16 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     messageBox: {
-        backgroundColor: '#375FFF',
+        // backgroundColor: '#375FFF',
         minHeight: 40,
-        paddingVertical: 5,
+        paddingVertical:7,
         paddingHorizontal: 10,
         borderRadius: 15,
         marginBottom: 8,
-        maxWidth: 320
+        maxWidth: 320,
+        // flexDirection:'row',
+justifyContent:'flex-end',
+
     },
     inputContainer: {
         backgroundColor: '#FFFFFF',

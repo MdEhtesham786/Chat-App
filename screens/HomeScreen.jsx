@@ -159,7 +159,7 @@ const HomeScreen = () => {
                 navigation.navigate('AddFriend');
             } else if (data.type === 'sendMessage') {
                 // fetchChat(user._id, data.friendID);
-                navigation.navigate('Message', { friendID: data.friendID, userID: data.userID });
+                navigation.navigate('Message',{ userID:data?.userID, friendID:data?.friendID, avatar:data?.avatar });
             }
         });
         return () => {

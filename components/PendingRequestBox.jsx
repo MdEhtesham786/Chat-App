@@ -17,7 +17,7 @@ const PendingRequestBox = ({ avatar, name, userID, pendingID }) => {
     const navigation = useNavigation();
     const handleDeclineRequest = async (userID, pendingID) => {
         try {
-            Alert.alert('Decline Request', "Are you sure you want to decline this nigga's request?", [
+            Alert.alert('Decline Request', "Decline this request?", [
                 {
                     text: 'Cancel',
                     onPress: () => null,
@@ -42,7 +42,7 @@ const PendingRequestBox = ({ avatar, name, userID, pendingID }) => {
     };
     const handleAcceptRequest = async (userID, pendingID) => {
         try {
-            Alert.alert('Add Friend', "Are you sure you want to accept this nigga's request?", [
+            Alert.alert('Add Friend', "Accept this request?", [
                 {
                     text: 'Cancel',
                     onPress: () => null,

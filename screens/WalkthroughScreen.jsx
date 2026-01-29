@@ -72,19 +72,14 @@ const WalkthroughScreen = ({ navigation, route }) => {
     const fetchData = async (token) => {
         try {
             if (token) {
-                // console.log('token', token);
                 const res = await axios.post(`/auth/islogin`, { token });
-                console.log('three');
                 const { data } = res;
-                console.log('four');
-
                 if (data.success) {
                     if (data.user) {
                         dispatch(setIsLoggedIn(data.success));
                         dispatch(setPendingRequest(data.user.pendingRequest));
                         dispatch(setUser(data.user));
                         if (data.hasProfile) {
-                            // usePushNotifications();
                             navigation.navigate("Home");
                         } else {
                             navigation.navigate("Profile");

@@ -87,6 +87,7 @@ const OtpScreen = ({ navigation, route }) => {
 
                 if (user.email.includes('@')) {
                     setResend(false);
+                    console.log('userrr', user).email;
                     let res = await axios.post('/auth/forgot', { email: user.email });
 
                     const { data } = res;
